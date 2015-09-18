@@ -9,6 +9,10 @@ import (
     //"io/ioutil"
 )
 
+import (
+    "github.com/golang/glog"
+)
+
 type ReqHttp struct {
 	httpClient *http.Client
 	method     string
@@ -41,6 +45,7 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 	var err error
 	request, err := http.NewRequest(r.method, r.url, nil)
 	if err != nil {
+        glog.Error(err.Error())
 		return nil, err
 	}
 
@@ -49,7 +54,7 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 
 	response, err := r.httpClient.Do(request)
 	if err != nil {
-		//glog.Error(err.Error())
+		glog.Error(err.Error())
 		return nil, err
 	}
 
@@ -64,7 +69,7 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
         return response, nil
     } else {
     	//glog.Error(response.StatusCode)
-    	//glog.Error(POST_DATA_FAILED)
+    	glog.Error(GET_DATA_FAILED)
 		return nil, GET_DATA_FAILED
     }
 }
@@ -83,13 +88,14 @@ func (r *ReqHttp) DoPostData(body []byte) error {
 	response, err := r.httpClient.Do(request)
 
 	if err != nil {
+        glog.Error(err.Error())
 		return err
 	}
-
 
 	if response.StatusCode == 200 {
 
     } else {
+        glog.Error(POST_DATA_FAILED)
 		return POST_DATA_FAILED
     }
 

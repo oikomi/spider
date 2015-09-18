@@ -6,6 +6,7 @@ import (
 )
 
 import (
+    "github.com/golang/glog"
     "golang.org/x/net/html/charset"
 )
 
@@ -14,13 +15,13 @@ func ChangeCharsetEncodingAuto(sor io.ReadCloser, contentTypeStr string) string 
 	destReader, err := charset.NewReader(sor, contentTypeStr)
 
 	if err != nil {
-		//log.Println(err.Error())
+		glog.Error(err.Error())
 		destReader = sor
 	}
 
 	var sorbody []byte
 	if sorbody, err = ioutil.ReadAll(destReader); err != nil {
-		//log.Println(err.Error())
+		glog.Error(err.Error())
 		// For gb2312, an error will be returned.
 		// Error like: simplifiedchinese: invalid GBK encoding
 		// return ""

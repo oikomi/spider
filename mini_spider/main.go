@@ -9,6 +9,7 @@ import (
 
 import (
     "gopkg.in/gcfg.v1"
+    "github.com/golang/glog"
 )
 
 import (
@@ -20,6 +21,11 @@ const (
     VERSION string = "1.0.0"
     CONF_NAME string = "conf.ini"
 )
+
+func init() {
+	flag.Set("alsologtostderr", "true")
+	flag.Set("log_dir", "false")
+}
 
 func version() string {
 	//fmt.Printf("mini_spider version %s \n", VERSION)
@@ -57,11 +63,12 @@ func parseSeedUrls(path string) ([]string, error) {
 func main() {
     showHelp := flag.Bool("h", false, "show help info")
     //versionInfo := flag.Bool("v", true, "show version info")
-    showVersion := flag.Bool("v", false, "show version info")
+    showVersion := flag.Bool("vv", false, "show version info")
     confPath := flag.String("c", "../conf", "config conf path")
     logPath := flag.String("l", "../log", "config conf path")
     flag.Parse()
     fmt.Println(*logPath)
+
     if *showHelp {
         showHelpInfo()
         os.Exit(0)
@@ -76,16 +83,13 @@ func main() {
     err := gcfg.ReadFileInto(&cfg, *confPath + "/" + CONF_NAME)
 
     if err != nil {
-        fmt.Println(err)
-    } else {
-        fmt.Println(cfg)
+        glog.Error(err.Error())
+        os.Exit(1)
     }
-
     seedUrlList, err := parseSeedUrls(cfg.Spider.UrlListFile)
     if err != nil {
-        fmt.Println(err)
-    } else {
-        fmt.Println(seedUrlList)
+        glog.Error(err.Error())
+        os.Exit(1)
     }
     spider := core.NewSpider(cfg, seedUrlList)
     spider.Start()

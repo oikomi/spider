@@ -40,6 +40,10 @@ func (l *LinkQueue) unVistedUrlsEnmpy() bool {
     return l.unVisted.Size() == 0
 }
 
+func (l *LinkQueue) isUrlInVisted(url string) bool {
+    return l.visted.Contain(url)
+}
+
 func (l *LinkQueue) dispalyVisted() {
     l.visted.display()
 }

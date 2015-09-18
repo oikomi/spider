@@ -7,6 +7,7 @@ import (
 )
 
 import (
+    "github.com/golang/glog"
     "github.com/PuerkitoBio/goquery"
 )
 
@@ -28,12 +29,12 @@ func NewDownLoader(seed string, timeout time.Duration) *DownLoader {
 
     newSeed, err := util.CheckBaseurl(seed)
     if err != nil {
-
+        glog.Error(err.Error())
     }
 
-    host, err := util.ParseHost(newSeed)
+    host, err := util.ParseSchemeHost(newSeed)
     if err != nil {
-
+        glog.Error(err.Error())
     }
 
     return &DownLoader {
@@ -44,17 +45,19 @@ func NewDownLoader(seed string, timeout time.Duration) *DownLoader {
     }
 }
 
-
 func (d *DownLoader)crawling() error {
     for {
         if !d.lq.unVistedUrlsEnmpy() {
             url := d.lq.getUnvisitedUrl()
+            if d.lq.isUrlInVisted(url) {
+                continue
+            }
             fmt.Println(url)
             d.getHyperLinks(url)
 
             d.lq.addVistedUrl(url)
         } else {
-            //d.lq.dispalyVisted()
+            d.lq.dispalyVisted()
             break
         }
     }
@@ -70,11 +73,13 @@ func (d *DownLoader)getHyperLinks(url string) error {
     rh.AddHeader("User-agent", USER_AGENT)
     httpRes, err := rh.DoGetData()
     if err != nil {
+        glog.Error(err.Error())
 		return err
 	}
 
     doc, err := goquery.NewDocumentFromResponse(httpRes)
     if err != nil {
+        glog.Error(err.Error())
 		return err
 	}
     doc.Find("a").Each(func(i int, s *goquery.Selection) {
@@ -83,7 +88,7 @@ func (d *DownLoader)getHyperLinks(url string) error {
             link, err = util.CheckLink(link, d.host)
             fmt.Println(link)
             if err != nil {
-        		//return err
+                glog.Error(err.Error())
         	}
             if link != "" {
                 fmt.Println("----")
