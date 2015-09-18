@@ -63,6 +63,9 @@ func (d *DownLoader)crawling() error {
 }
 
 func (d *DownLoader)getHyperLinks(url string) error {
+    fmt.Println("*******")
+    fmt.Println(url)
+    fmt.Println("*******")
     rh := NewReqHttp(url, "GET", d.crawlTimeout)
     rh.AddHeader("User-agent", USER_AGENT)
     httpRes, err := rh.DoGetData()
@@ -78,12 +81,14 @@ func (d *DownLoader)getHyperLinks(url string) error {
         link, exits := s.Attr("href")
         if exits {
             link, err = util.CheckLink(link, d.host)
+            fmt.Println(link)
             if err != nil {
         		//return err
         	}
             if link != "" {
                 fmt.Println("----")
                 fmt.Println(link)
+                fmt.Println("----")
                 d.lq.addUnVistedUrl(link)
             }
         }
