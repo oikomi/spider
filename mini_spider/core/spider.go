@@ -28,12 +28,15 @@ func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
     }
 }
 
-func (s *Spider)run(rootUrl string) {
-
-}
+// func (s *Spider)run(rootUrl string) {
+//     d := NewDownLoader(rootUrl, s.crawlTimeout)
+//     d.crawling()
+// }
 
 func (s *Spider)Start() {
-    for _, rootUrl := range s.rootUrlList {
-        s.run(rootUrl)
-    }
+    // for _, rootUrl := range s.rootUrlList {
+    //     s.run(rootUrl)
+    // }
+    d := NewDownLoader(s.rootUrlList, s.crawlTimeout)
+    d.crawling()
 }

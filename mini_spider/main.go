@@ -83,7 +83,6 @@ func main() {
 
     seedUrlList, err := parseSeedUrls(cfg.Spider.UrlListFile)
     if err != nil {
-        fmt.Println("----")
         fmt.Println(err)
     } else {
         fmt.Println(seedUrlList)

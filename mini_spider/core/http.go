@@ -2,11 +2,11 @@
 package core
 
 import (
-    "fmt"
+    //"fmt"
     "time"
     "bytes"
     "net/http"
-    "io/ioutil"
+    //"io/ioutil"
 )
 
 type ReqHttp struct {
@@ -37,12 +37,11 @@ func (r *ReqHttp) SetHeader(key, val string) {
 	r.header.Set(key, val)
 }
 
-func (r *ReqHttp) DoGetData() error {
+func (r *ReqHttp) DoGetData() (*http.Response, error) {
 	var err error
 	request, err := http.NewRequest(r.method, r.url, nil)
 	if err != nil {
-		//glog.Error(err.Error())
-		return err
+		return nil, err
 	}
 
 	//add header
@@ -51,24 +50,23 @@ func (r *ReqHttp) DoGetData() error {
 	response, err := r.httpClient.Do(request)
 	if err != nil {
 		//glog.Error(err.Error())
-		return err
+		return nil, err
 	}
 
     if response.StatusCode == 200 {
-        body, err := ioutil.ReadAll(response.Body)
-        if err != nil {
+        //body, err := ioutil.ReadAll(response.Body)
+        //if err != nil {
  			//glog.Error(err.Error())
-			return err
-        }
-        bodystr := string(body);
-        fmt.Println(bodystr)
+			//return err
+        //}
+        //bodystr := string(body);
+        //fmt.Println(bodystr)
+        return response, nil
     } else {
     	//glog.Error(response.StatusCode)
     	//glog.Error(POST_DATA_FAILED)
-		return GET_DATA_FAILED
+		return nil, GET_DATA_FAILED
     }
-
-    return err
 }
 
 func (r *ReqHttp) DoPostData(body []byte) error {
@@ -76,7 +74,6 @@ func (r *ReqHttp) DoPostData(body []byte) error {
 
 	request, err := http.NewRequest(r.method, r.url, bytes.NewReader(body))
 	if err != nil {
-		//glog.Error(err.Error())
 		return err
 	}
 
@@ -86,23 +83,13 @@ func (r *ReqHttp) DoPostData(body []byte) error {
 	response, err := r.httpClient.Do(request)
 
 	if err != nil {
-		//glog.Error(err.Error())
 		return err
 	}
 
-	//glog.Info(response.StatusCode)
 
 	if response.StatusCode == 200 {
-   //      body, err := ioutil.ReadAll(response.Body)
-   //      if err != nil {
- 		// 	glog.Error(err.Error())
-			// return err
-   //      }
-   //      bodystr := string(body);
-   //      fmt.Println(bodystr)
+
     } else {
-    	//glog.Error(response.StatusCode)
-    	//glog.Error(POST_DATA_FAILED)
 		return POST_DATA_FAILED
     }
 
