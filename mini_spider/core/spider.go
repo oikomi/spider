@@ -9,16 +9,21 @@ import (
 )
 
 type Spider struct {
+    cfg             conf.Config
+
     rootUrlList     []string
     maxDepth        int
     crawlInterval   int
     crawlTimeout    time.Duration
     targetUrl       string
     threadCount     int
+
 }
 
 func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
+
     return &Spider {
+        cfg           : cfg,
         rootUrlList   : seedUrlList,
         maxDepth      : cfg.Spider.MaxDepth,
         crawlInterval : cfg.Spider.CrawlInterval,
@@ -28,14 +33,10 @@ func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
     }
 }
 
-// func (s *Spider)run(rootUrl string) {
-//     d := NewDownLoader(rootUrl, s.crawlTimeout)
-//     d.crawling()
-// }
 
 func (s *Spider)Start() {
     for _, rootUrl := range s.rootUrlList {
-        d := NewDownLoader(rootUrl, s.crawlTimeout)
+        d := NewDownLoader(rootUrl, s.cfg)
         d.crawling()
     }
 

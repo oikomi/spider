@@ -13,17 +13,19 @@ import (
 
 import (
     "Go-id-3957/mini_spider/util"
+    "Go-id-3957/mini_spider/conf"
 )
 
 type DownLoader struct {
+    cfg           conf.Config
     host          string
     seed          string
     crawlTimeout  time.Duration
 
-    lq            *LinkQueue
+    linkQueue     *LinkQueue
 }
 
-func NewDownLoader(seed string, timeout time.Duration) *DownLoader {
+func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
     initLq := NewLinkQueue()
     initLq.addUnVistedUrl(seed)
 
@@ -38,26 +40,27 @@ func NewDownLoader(seed string, timeout time.Duration) *DownLoader {
     }
 
     return &DownLoader {
+        cfg  : cfg,
         host : host,
         seed : seed,
-        crawlTimeout : timeout,
-        lq : initLq,
+        crawlTimeout : cfg.Spider.CrawlTimeout,
+        linkQueue : initLq,
     }
 }
 
 func (d *DownLoader)crawling() error {
     for {
-        if !d.lq.unVistedUrlsEnmpy() {
-            url := d.lq.getUnvisitedUrl()
-            if d.lq.isUrlInVisted(url) {
+        if !d.linkQueue.unVistedUrlsEnmpy() {
+            url := d.linkQueue.getUnvisitedUrl()
+            if d.linkQueue.isUrlInVisted(url) {
                 continue
             }
             fmt.Println(url)
             d.getHyperLinks(url)
 
-            d.lq.addVistedUrl(url)
+            d.linkQueue.addVistedUrl(url)
         } else {
-            d.lq.dispalyVisted()
+            d.linkQueue.dispalyVisted()
             break
         }
     }
@@ -94,7 +97,7 @@ func (d *DownLoader)getHyperLinks(url string) error {
                 fmt.Println("----")
                 fmt.Println(link)
                 fmt.Println("----")
-                d.lq.addUnVistedUrl(link)
+                d.linkQueue.addUnVistedUrl(link)
             }
         }
     })
