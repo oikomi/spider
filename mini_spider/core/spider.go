@@ -34,9 +34,9 @@ func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
 // }
 
 func (s *Spider)Start() {
-    // for _, rootUrl := range s.rootUrlList {
-    //     s.run(rootUrl)
-    // }
-    d := NewDownLoader(s.rootUrlList, s.crawlTimeout)
-    d.crawling()
+    for _, rootUrl := range s.rootUrlList {
+        d := NewDownLoader(rootUrl, s.crawlTimeout)
+        d.crawling()
+    }
+
 }
