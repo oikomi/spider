@@ -13,7 +13,7 @@ type Spider struct {
 
     rootUrlList     []string
     maxDepth        int
-    crawlInterval   int
+    crawlInterval   time.Duration
     crawlTimeout    time.Duration
     targetUrl       string
     threadCount     int

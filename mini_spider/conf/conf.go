@@ -10,7 +10,7 @@ type Config struct {
         UrlListFile     string
         OutputDirectory string
         MaxDepth        int
-        CrawlInterval   int
+        CrawlInterval   time.Duration
         CrawlTimeout    time.Duration
         TargetUrl       string
         ThreadCount     int

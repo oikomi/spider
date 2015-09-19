@@ -69,6 +69,7 @@ func (d *DownLoader)crawling() error {
                         continue
                     }
                     glog.Info(url)
+                    time.Sleep(d.cfg.Spider.CrawlInterval * time.Second)
                     d.getHyperLinks(url)
 
                     d.linkQueue.addVistedUrl(url)
