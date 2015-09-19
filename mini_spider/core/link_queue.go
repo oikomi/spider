@@ -51,6 +51,8 @@ func (l *LinkQueue) dispalyVisted() {
 func (l *LinkQueue) dispalyUnVisted() {
     l.unVisted.display()
 }
+
+
 //
 // func (l *LinkQueue) getUnvistedUrlCount() int {
 //     return len(l.unVisited)

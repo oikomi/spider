@@ -15,6 +15,7 @@ import (
 func ParseSchemeHost(rawurl string) (string, error) {
     u, err := url.Parse(rawurl)
     if err != nil {
+		glog.Error(err.Error())
     	return "", err
     }
 
