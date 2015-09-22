@@ -3,7 +3,10 @@ package main
 import (
     "os"
     "fmt"
+    "sync"
     "flag"
+    "syscall"
+    "os/signal"
     "encoding/json"
 )
 
@@ -21,6 +24,20 @@ const (
     VERSION string = "1.0.0"
     CONF_NAME string = "conf.ini"
 )
+
+
+type WaitGroupWrapper struct {
+    sync.WaitGroup
+}
+
+func (w *WaitGroupWrapper) Wrap(cb func()) {
+    w.Add(1)
+    go func() {
+        cb()
+        w.Done()
+    }()
+}
+
 
 func init() {
 	flag.Set("alsologtostderr", "true")
@@ -57,10 +74,20 @@ func parseSeedUrls(path string) ([]string, error) {
     if err != nil {
     	return nil, err
     }
+    
     return seedUrlList, nil
 }
 
 func main() {
+    signalChan := make(chan os.Signal, 1)
+    exitChan := make(chan int)
+    go func() {
+        <-signalChan
+        exitChan <- 1
+    }()
+
+    signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+
     showHelp := flag.Bool("h", false, "show help info")
     //versionInfo := flag.Bool("v", true, "show version info")
     showVersion := flag.Bool("vv", false, "show version info")
@@ -92,5 +119,9 @@ func main() {
         os.Exit(1)
     }
     spider := core.NewSpider(cfg, seedUrlList)
+    // waitGroup := &WaitGroupWrapper{}
+    // waitGroup.Wrap(func() {
+    //     spider.Start()
+    // })
     spider.Start()
 }

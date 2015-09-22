@@ -17,7 +17,6 @@ type Spider struct {
     crawlTimeout    time.Duration
     targetUrl       string
     threadCount     int
-
 }
 
 func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {

@@ -40,6 +40,10 @@ func (l *LinkQueue) unVistedUrlsEnmpy() bool {
     return l.unVisted.Size() == 0
 }
 
+func (l *LinkQueue) getUnvistedUrlCount() int {
+    return l.unVisted.Size()
+}
+
 func (l *LinkQueue) isUrlInVisted(url string) bool {
     return l.visted.Contain(url)
 }

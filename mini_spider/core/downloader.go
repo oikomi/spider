@@ -2,6 +2,7 @@ package core
 
 import (
     "time"
+    "sync"
     //"net/http"
 )
 
@@ -15,6 +16,18 @@ import (
     "Go-id-3957/mini_spider/conf"
 )
 
+type WaitGroupWrapper struct {
+    sync.WaitGroup
+}
+
+func (w *WaitGroupWrapper) Wrap(cb func()) {
+    w.Add(1)
+    go func() {
+        cb()
+        w.Done()
+    }()
+}
+
 type DownLoader struct {
     cfg           conf.Config
 
@@ -25,6 +38,8 @@ type DownLoader struct {
     currentDeepth int
 
     linkQueue     *LinkQueue
+
+    waitGroup     *WaitGroupWrapper
 }
 
 func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
@@ -41,12 +56,15 @@ func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
         glog.Error(err.Error())
     }
 
+    waitGroup := &WaitGroupWrapper{}
+
     return &DownLoader {
         cfg  : cfg,
         host : host,
         seed : seed,
         crawlTimeout : cfg.Spider.CrawlTimeout,
         linkQueue : initLq,
+        waitGroup : waitGroup,
     }
 }
 
@@ -62,17 +80,44 @@ func (d *DownLoader)crawling() error {
                 //glog.Info("-------")
                 //d.linkQueue.dispalyVisted()
                 if !d.linkQueue.unVistedUrlsEnmpy() {
-                    url := d.linkQueue.getUnvisitedUrl()
-                    glog.Info(url)
-                    if d.linkQueue.isUrlInVisted(url) {
-                        glog.Info("撞墙")
-                        continue
-                    }
-                    glog.Info(url)
-                    time.Sleep(d.cfg.Spider.CrawlInterval * time.Second)
-                    d.getHyperLinks(url)
 
-                    d.linkQueue.addVistedUrl(url)
+                    //
+                    for i := 0; i < d.linkQueue.getUnvistedUrlCount() && i < d.cfg.Spider.ThreadCount; i++ {
+                        url := d.linkQueue.getUnvisitedUrl()
+                        glog.Info(url)
+                        if d.linkQueue.isUrlInVisted(url) {
+                            glog.Info("撞墙")
+                            continue
+                        }
+                        glog.Info(url)
+
+                        //d.getHyperLinks(url)
+
+                        d.waitGroup.Wrap(func() {
+                            d.getHyperLinks(url)
+                            time.Sleep(d.cfg.Spider.CrawlInterval * time.Second)
+                            //d.linkQueue.addVistedUrl(url)
+                        })
+                    }
+
+                    // url := d.linkQueue.getUnvisitedUrl()
+                    // glog.Info(url)
+                    // if d.linkQueue.isUrlInVisted(url) {
+                    //     glog.Info("撞墙")
+                    //     continue
+                    // }
+                    // glog.Info(url)
+                    // time.Sleep(d.cfg.Spider.CrawlInterval * time.Second)
+                    // //d.getHyperLinks(url)
+                    //
+                    // d.waitGroup.Wrap(func() {
+                    //     d.getHyperLinks(url)
+                    //     //d.linkQueue.addVistedUrl(url)
+                    // })
+
+                    d.waitGroup.Wait()
+
+                    //d.linkQueue.addVistedUrl(url)
                 } else {
                     glog.Info("!!!!!!!!!")
                     d.linkQueue.dispalyVisted()
@@ -84,10 +129,15 @@ func (d *DownLoader)crawling() error {
         d.currentDeepth ++
     }
 
+    d.waitGroup.Wait()
+
     return nil
 }
 
 func (d *DownLoader)getHyperLinks(url string) error {
+    //defer d.waitGroup.Done()
+    d.linkQueue.addVistedUrl(url)
+
     rh := NewReqHttp(url, "GET", d.crawlTimeout)
     rh.AddHeader("User-agent", USER_AGENT)
     httpRes, err := rh.DoGetData()
