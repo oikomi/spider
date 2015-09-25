@@ -80,7 +80,6 @@ func (d *DownLoader)crawling() error {
                 //glog.Info("-------")
                 //d.linkQueue.dispalyVisted()
                 if !d.linkQueue.unVistedUrlsEnmpy() {
-
                     //
                     for i := 0; i < d.linkQueue.getUnvistedUrlCount() && i < d.cfg.Spider.ThreadCount; i++ {
                         url := d.linkQueue.getUnvisitedUrl()
