@@ -68,7 +68,8 @@ func NewCrawler(seed string, cfg conf.Config) *Crawler {
     }
 }
 
-func (c *Crawler)crawling() error {
+func (c *Crawler) crawling() error {
+    var err error
     for {
         if c.currentDeepth >= c.cfg.Spider.MaxDepth {
             glog.Info("========== All links result ==========")
@@ -93,7 +94,11 @@ func (c *Crawler)crawling() error {
                         //d.getHyperLinks(url)
 
                         c.waitGroup.Wrap(func() {
-                            c.getHyperLinks(url)
+                            err = c.getHyperLinks(url)
+                            if err != nil {
+                                glog.Error(err.Error())
+                            }
+
                             time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                             //d.linkQueue.addVistedUrl(url)
                         })
@@ -150,6 +155,7 @@ func (c *Crawler)getHyperLinks(url string) error {
         glog.Error(err.Error())
 		return err
 	}
+
     doc.Find("a").Each(func(i int, s *goquery.Selection) {
         link, exits := s.Attr("href")
         if exits {

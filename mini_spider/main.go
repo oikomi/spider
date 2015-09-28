@@ -30,13 +30,13 @@ type WaitGroupWrapper struct {
     sync.WaitGroup
 }
 
-func (w *WaitGroupWrapper) Wrap(cb func()) {
-    w.Add(1)
-    go func() {
-        cb()
-        w.Done()
-    }()
-}
+// func (w *WaitGroupWrapper) Wrap(cb func()) {
+//     w.Add(1)
+//     go func() {
+//         cb()
+//         w.Done()
+//     }()
+// }
 
 
 func init() {
@@ -124,4 +124,8 @@ func main() {
     //     spider.Start()
     // })
     spider.Start()
+
+    // <-exitChan
+
+    // spider.Stop()
 }
