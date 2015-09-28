@@ -28,7 +28,7 @@ func (w *WaitGroupWrapper) Wrap(cb func()) {
     }()
 }
 
-type DownLoader struct {
+type Crawler struct {
     cfg           conf.Config
 
     host          string
@@ -42,7 +42,7 @@ type DownLoader struct {
     waitGroup     *WaitGroupWrapper
 }
 
-func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
+func NewCrawler(seed string, cfg conf.Config) *Crawler {
     initLq := NewLinkQueue()
     initLq.addUnVistedUrl(seed)
 
@@ -58,7 +58,7 @@ func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
 
     waitGroup := &WaitGroupWrapper{}
 
-    return &DownLoader {
+    return &Crawler {
         cfg  : cfg,
         host : host,
         seed : seed,
@@ -68,23 +68,23 @@ func NewDownLoader(seed string, cfg conf.Config) *DownLoader {
     }
 }
 
-func (d *DownLoader)crawling() error {
+func (c *Crawler)crawling() error {
     for {
-        if d.currentDeepth >= d.cfg.Spider.MaxDepth {
-            glog.Info("!!!!!!!!!")
-            d.linkQueue.dispalyVisted()
+        if c.currentDeepth >= c.cfg.Spider.MaxDepth {
+            glog.Info("========== All links result ==========")
+            c.linkQueue.dispalyVisted()
             break
         } else {
             for {
                 //d.linkQueue.dispalyUnVisted()
                 //glog.Info("-------")
                 //d.linkQueue.dispalyVisted()
-                if !d.linkQueue.unVistedUrlsEnmpy() {
+                if !c.linkQueue.unVistedUrlsEmpty() {
                     //
-                    for i := 0; i < d.linkQueue.getUnvistedUrlCount() && i < d.cfg.Spider.ThreadCount; i++ {
-                        url := d.linkQueue.getUnvisitedUrl()
+                    for i := 0; i < c.linkQueue.getUnvistedUrlCount() && i < c.cfg.Spider.ThreadCount; i++ {
+                        url := c.linkQueue.getUnvisitedUrl()
                         glog.Info(url)
-                        if d.linkQueue.isUrlInVisted(url) {
+                        if c.linkQueue.isUrlInVisted(url) {
                             glog.Info("撞墙")
                             continue
                         }
@@ -92,9 +92,9 @@ func (d *DownLoader)crawling() error {
 
                         //d.getHyperLinks(url)
 
-                        d.waitGroup.Wrap(func() {
-                            d.getHyperLinks(url)
-                            time.Sleep(d.cfg.Spider.CrawlInterval * time.Second)
+                        c.waitGroup.Wrap(func() {
+                            c.getHyperLinks(url)
+                            time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                             //d.linkQueue.addVistedUrl(url)
                         })
                     }
@@ -114,30 +114,30 @@ func (d *DownLoader)crawling() error {
                     //     //d.linkQueue.addVistedUrl(url)
                     // })
 
-                    d.waitGroup.Wait()
+                    c.waitGroup.Wait()
 
                     //d.linkQueue.addVistedUrl(url)
                 } else {
-                    glog.Info("!!!!!!!!!")
-                    d.linkQueue.dispalyVisted()
+                    //glog.Info("!!!!!!!!!")
+                    //d.linkQueue.dispalyVisted()
                     break
                 }
             }
         }
 
-        d.currentDeepth ++
+        c.currentDeepth ++
     }
 
-    d.waitGroup.Wait()
+    c.waitGroup.Wait()
 
     return nil
 }
 
-func (d *DownLoader)getHyperLinks(url string) error {
+func (c *Crawler)getHyperLinks(url string) error {
     //defer d.waitGroup.Done()
-    d.linkQueue.addVistedUrl(url)
+    c.linkQueue.addVistedUrl(url)
 
-    rh := NewReqHttp(url, "GET", d.crawlTimeout)
+    rh := NewReqHttp(url, "GET", c.crawlTimeout)
     rh.AddHeader("User-agent", USER_AGENT)
     httpRes, err := rh.DoGetData()
     if err != nil {
@@ -153,7 +153,7 @@ func (d *DownLoader)getHyperLinks(url string) error {
     doc.Find("a").Each(func(i int, s *goquery.Selection) {
         link, exits := s.Attr("href")
         if exits {
-            link, err = util.CheckLink(link, d.host)
+            link, err = util.CheckLink(link, c.host)
             //fmt.Println(link)
             if err != nil {
                 glog.Error(err.Error())
@@ -161,7 +161,7 @@ func (d *DownLoader)getHyperLinks(url string) error {
             if link != "" {
                 //glog.Info("add url to unvisited list")
                 //glog.Info(link)
-                d.linkQueue.addUnVistedUrl(link)
+                c.linkQueue.addUnVistedUrl(link)
             }
         }
     })

@@ -36,7 +36,7 @@ func (l *LinkQueue) addUnVistedUrl(url string) {
     l.unVisted.Enqueue(url)
 }
 
-func (l *LinkQueue) unVistedUrlsEnmpy() bool {
+func (l *LinkQueue) unVistedUrlsEmpty() bool {
     return l.unVisted.Size() == 0
 }
 
