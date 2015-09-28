@@ -1,18 +1,17 @@
-
 package conf
 
 import (
-    "time"
+	"time"
 )
 
 type Config struct {
-    Spider struct {
-        UrlListFile     string
-        OutputDirectory string
-        MaxDepth        int
-        CrawlInterval   time.Duration
-        CrawlTimeout    time.Duration
-        TargetUrl       string
-        ThreadCount     int
-    }
+	Spider struct {
+		UrlListFile     string
+		OutputDirectory string
+		MaxDepth        int
+		CrawlInterval   time.Duration
+		CrawlTimeout    time.Duration
+		TargetUrl       string
+		ThreadCount     int
+	}
 }

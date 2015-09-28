@@ -2,8 +2,8 @@ package util
 
 import (
 	"io"
-	"net/url"
 	"io/ioutil"
+	"net/url"
 	//"strings"
 )
 
@@ -13,13 +13,13 @@ import (
 )
 
 func ParseSchemeHost(rawurl string) (string, error) {
-    u, err := url.Parse(rawurl)
-    if err != nil {
+	u, err := url.Parse(rawurl)
+	if err != nil {
 		glog.Error(err.Error())
-    	return "", err
-    }
+		return "", err
+	}
 
-    return u.Scheme + "://" + u.Host, nil
+	return u.Scheme + "://" + u.Host, nil
 }
 
 func ChangeCharsetEncodingAuto(sor io.ReadCloser, contentTypeStr string) string {

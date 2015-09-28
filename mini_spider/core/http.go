@@ -1,16 +1,15 @@
-
 package core
 
 import (
-    //"fmt"
-    "time"
-    "bytes"
-    "net/http"
-    //"io/ioutil"
+	//"fmt"
+	"bytes"
+	"net/http"
+	"time"
+	//"io/ioutil"
 )
 
 import (
-    "github.com/golang/glog"
+	"github.com/golang/glog"
 )
 
 type ReqHttp struct {
@@ -21,15 +20,15 @@ type ReqHttp struct {
 }
 
 func NewReqHttp(url string, method string, timeout time.Duration) *ReqHttp {
-	client := http.Client {
-	    Timeout: time.Duration(timeout * time.Second),
+	client := http.Client{
+		Timeout: time.Duration(timeout * time.Second),
 	}
 
-	return &ReqHttp {
-		method     : method,
-		url        : url,
-		httpClient : &client,
-		header     : make(http.Header),
+	return &ReqHttp{
+		method:     method,
+		url:        url,
+		httpClient: &client,
+		header:     make(http.Header),
 	}
 }
 
@@ -45,7 +44,7 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 	var err error
 	request, err := http.NewRequest(r.method, r.url, nil)
 	if err != nil {
-        glog.Error(err.Error())
+		glog.Error(err.Error())
 		return nil, err
 	}
 
@@ -58,20 +57,20 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 		return nil, err
 	}
 
-    if response.StatusCode == 200 {
-        //body, err := ioutil.ReadAll(response.Body)
-        //if err != nil {
- 			//glog.Error(err.Error())
-			//return err
-        //}
-        //bodystr := string(body);
-        //fmt.Println(bodystr)
-        return response, nil
-    } else {
-    	//glog.Error(response.StatusCode)
-    	glog.Error(GET_DATA_FAILED)
+	if response.StatusCode == 200 {
+		//body, err := ioutil.ReadAll(response.Body)
+		//if err != nil {
+		//glog.Error(err.Error())
+		//return err
+		//}
+		//bodystr := string(body);
+		//fmt.Println(bodystr)
+		return response, nil
+	} else {
+		//glog.Error(response.StatusCode)
+		glog.Error(GET_DATA_FAILED)
 		return nil, GET_DATA_FAILED
-    }
+	}
 }
 
 func (r *ReqHttp) DoPostData(body []byte) error {
@@ -88,16 +87,16 @@ func (r *ReqHttp) DoPostData(body []byte) error {
 	response, err := r.httpClient.Do(request)
 
 	if err != nil {
-        glog.Error(err.Error())
+		glog.Error(err.Error())
 		return err
 	}
 
 	if response.StatusCode == 200 {
 
-    } else {
-        glog.Error(POST_DATA_FAILED)
+	} else {
+		glog.Error(POST_DATA_FAILED)
 		return POST_DATA_FAILED
-    }
+	}
 
 	return err
 }

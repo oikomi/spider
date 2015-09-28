@@ -13,7 +13,7 @@ func Check(e error) {
 
 func CheckBaseurl(rawUrl string) (string, error) {
 	u, err := url.Parse(rawUrl)
-    if err != nil {
+	if err != nil {
 		return "", err
 	}
 
@@ -28,7 +28,7 @@ func CheckBaseurl(rawUrl string) (string, error) {
 
 func CheckLink(link string, host string) (string, error) {
 	u, err := url.Parse(link)
-    if err != nil {
+	if err != nil {
 		return "", err
 	}
 	if u.Scheme != "" {
