@@ -1,7 +1,7 @@
 package core
 
 import (
-	"time"
+	//"time"
 )
 
 import (
@@ -16,22 +16,12 @@ type Spider struct {
 	cfg conf.Config
 
 	rootUrlList   []string
-	maxDepth      int
-	crawlInterval time.Duration
-	crawlTimeout  time.Duration
-	targetUrl     string
-	threadCount   int
 }
 
 func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
 	return &Spider{
 		cfg:           cfg,
 		rootUrlList:   seedUrlList,
-		maxDepth:      cfg.Spider.MaxDepth,
-		crawlInterval: cfg.Spider.CrawlInterval,
-		crawlTimeout:  cfg.Spider.CrawlTimeout,
-		targetUrl:     cfg.Spider.TargetUrl,
-		threadCount:   cfg.Spider.ThreadCount,
 	}
 }
 

@@ -15,7 +15,3 @@ func (w *WaitGroupWrapper) Wrap(cb func()) {
 		w.Done()
 	}()
 }
-
-// func (w *WaitGroupWrapper) WaitAllFinish() {
-// 	w.Wait()
-// }

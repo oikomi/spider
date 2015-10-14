@@ -3,6 +3,7 @@ package core
 import (
     "fmt"
     "time"
+    "strings"
     //"sync"
     //"net/http"
 )
@@ -77,8 +78,6 @@ func (c *Crawler) crawling() error {
             break
         }
 
-        fmt.Println("****")
-
         if c.currentDeepth >= c.cfg.Spider.MaxDepth {
             glog.Info("========== All links result ==========")
             c.linkQueue.dispalyVisted()
@@ -152,15 +151,30 @@ func (c *Crawler)getHyperLinks(url string) error {
     doc.Find("a").Each(func(i int, s *goquery.Selection) {
         link, exits := s.Attr("href")
         if exits {
-            link, err = util.CheckLink(link, c.host)
-            //fmt.Println(link)
-            if err != nil {
-                glog.Error(err.Error())
-        	}
-            if link != "" {
-                //glog.Info("add url to unvisited list")
-                //glog.Info(link)
-                c.linkQueue.addUnVistedUrl(link)
+            if ! strings.Contains(strings.ToLower(link),strings.ToLower("javascript")) {
+                link, err = util.CheckLink(link, c.host)
+                //fmt.Println(link)
+                if err != nil {
+                    glog.Error(err.Error())
+            	}
+                if link != "" {
+                    //glog.Info("add url to unvisited list")
+                    //glog.Info(link)
+                    c.linkQueue.addUnVistedUrl(link)
+                }
+            } else {
+                jslink := strings.SplitN(link, "=", 2)[1]
+                
+                jslink, err = util.CheckLink(strings.Replace(jslink, "\"", "", -1), c.host)
+                //fmt.Println(jslink)
+                if err != nil {
+                    glog.Error(err.Error())
+                }
+                if jslink != "" {
+                    //glog.Info("add url to unvisited list")
+                    //glog.Info(jslink)
+                    c.linkQueue.addUnVistedUrl(jslink)
+                }
             }
         }
     })
