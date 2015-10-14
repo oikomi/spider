@@ -42,7 +42,6 @@ func (s *Spider) Start() {
 		err = c.crawling()
 		if err != nil {
 			glog.Error(err.Error())
-
 		}
 	}
 }

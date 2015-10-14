@@ -26,7 +26,7 @@ func CheckBaseurl(rawUrl string) (string, error) {
 	return rawUrl, nil
 }
 
-func CheckLink(link string, host string) (string, error) {
+func CheckLink(link, host string) (string, error) {
 	u, err := url.Parse(link)
 	if err != nil {
 		return "", err
@@ -42,4 +42,26 @@ func CheckLink(link string, host string) (string, error) {
 		return link, nil
 	}
 	return "", nil
+}
+
+func CheckSrcLink(link, currentPath string) (string, error) {
+	u, err := url.Parse(link)
+	if err != nil {
+		return "", err
+	}
+	if u.Scheme != "" {
+		return "", nil
+	}
+	if u.Scheme == "http" || u.Scheme == "https" {
+		return link, nil
+	}
+
+	pathList := strings.Split(currentPath, "/")
+	var tmpPath string
+
+	for i := 0; i < len(pathList) - 1; i++ {
+		tmpPath += pathList[i] + "/"
+	}
+
+	return tmpPath + link, nil
 }
