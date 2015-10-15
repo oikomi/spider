@@ -19,18 +19,6 @@ import (
     "Go-id-3957/mini_spider/conf"
 )
 
-// type WaitGroupWrapper struct {
-//     sync.WaitGroup
-// }
-
-// func (w *WaitGroupWrapper) Wrap(cb func()) {
-//     w.Add(1)
-//     go func() {
-//         cb()
-//         w.Done()
-//     }()
-// }
-
 type Crawler struct {
     cfg           conf.Config
 
@@ -98,10 +86,11 @@ func (c *Crawler) crawling() error {
                     //
                     unvisitedNum := c.linkQueue.getUnvistedUrlCount()
                     // fixme : 
-                    for i := 0; i < unvisitedNum ; i++ { //&& i < c.cfg.Spider.ThreadCount; i++ {
+                    for i := 0; i < unvisitedNum; i++ { //&& i < c.cfg.Spider.ThreadCount; i++ {
                         // for j := 0; j < c.cfg.Spider.ThreadCount; j++ {
 
                         // }
+                            time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                             url := c.linkQueue.getUnvisitedUrl()
                             glog.Info(url)
                             if c.linkQueue.isUrlInVisted(url) {
@@ -110,20 +99,17 @@ func (c *Crawler) crawling() error {
                             }
                             glog.Info(url)
                             c.waitGroup.Wrap(func() {
-                                time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
+                                
                                 err = c.getHyperLinks(url)
                                 if err != nil {
                                     glog.Error(err.Error())
                                 }
-
-                                //d.linkQueue.addVistedUrl(url)
                             })
                             //time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                     }   
                     fmt.Println("---1----")  
                     c.waitGroup.Wait()
                     fmt.Println("---2----")  
-                    //c.currentDeepth ++
                     atomic.AddUint64(&c.currentDeepth, 1)
                 } else {
                     break
@@ -131,7 +117,6 @@ func (c *Crawler) crawling() error {
             }
         }
 
-        //c.currentDeepth ++
     }
 
     return nil
@@ -205,9 +190,10 @@ func (c *Crawler)getHyperLinks(url string) error {
                 glog.Error(err.Error())
             }
             if link != "" {
+                StorageBinaryData(link, c.cfg)
                 //glog.Info("add url to unvisited list")
                 //glog.Info(link)
-                c.linkQueue.addUnVistedUrl(link)
+                //c.linkQueue.addUnVistedUrl(link)
             }
         }
     })
