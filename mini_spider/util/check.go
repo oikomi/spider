@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+import (
+    "github.com/golang/glog"
+)
+
 func Check(e error) {
 	if e != nil {
 		panic(e)
@@ -26,7 +30,21 @@ func CheckBaseurl(rawUrl string) (string, error) {
 	return rawUrl, nil
 }
 
-func CheckLink(link, host string) (string, error) {
+func CheckLink(link, host, rawurl, basePath string) (string, error) {
+	basePathList := strings.Split(rawurl, "/")
+
+	var newBasePath string
+
+	// for _, p := range basePathList {
+	// 	newBasePath += p 
+	// 	newBasePath += "/"
+	// }
+
+	for i := 0; i < len(basePathList) -1; i++ {
+		newBasePath += basePathList[i] 
+		newBasePath += "/"
+	}
+
 	u, err := url.Parse(link)
 	if err != nil {
 		return "", err
@@ -38,7 +56,14 @@ func CheckLink(link, host string) (string, error) {
 		return link, nil
 	}
 	if flag := strings.HasPrefix(link, host); flag != true {
-		link = strings.Join([]string{host, link}, "/")
+		if basePath == "" {
+			link = strings.Join([]string{host, link}, "/")
+		} else {
+			glog.Info("basePath is not null ")
+			//link = strings.Join([]string{host + newBasePath + "/" + basePath, link}, "/")
+			link = newBasePath + "/" + basePath + "/" + link
+		}
+		//link = strings.Join([]string{host + "/" + basePath, link}, "/")
 		return link, nil
 	}
 	return "", nil

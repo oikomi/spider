@@ -9,7 +9,7 @@ type Config struct {
 	Spider struct {
 		UrlListFile     string
 		OutputDirectory string
-		MaxDepth        int
+		MaxDepth        uint64
 		CrawlInterval   time.Duration
 		CrawlTimeout    time.Duration
 		TargetUrl       string

@@ -41,6 +41,7 @@ func (r *ReqHttp) SetHeader(key, val string) {
 }
 
 func (r *ReqHttp) DoGetData() (*http.Response, error) {
+	glog.Info("start to download : " + r.url)
 	var err error
 	request, err := http.NewRequest(r.method, r.url, nil)
 	if err != nil {
@@ -69,6 +70,7 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 	} else {
 		//glog.Error(response.StatusCode)
 		glog.Error(GET_DATA_FAILED)
+		glog.Info("failed url is : " + r.url)
 		return nil, GET_DATA_FAILED
 	}
 }

@@ -4,6 +4,7 @@ import (
     "fmt"
     "time"
     "strings"
+    "sync/atomic"
     //"sync"
     //"net/http"
 )
@@ -37,7 +38,9 @@ type Crawler struct {
     seed          string
     crawlTimeout  time.Duration
 
-    currentDeepth int
+    currentDeepth uint64
+
+    baseHref      string
 
     linkQueue     *LinkQueue
 
@@ -95,7 +98,7 @@ func (c *Crawler) crawling() error {
                     //
                     unvisitedNum := c.linkQueue.getUnvistedUrlCount()
                     // fixme : 
-                    for i := 0; i < unvisitedNum && i < c.cfg.Spider.ThreadCount; i++ {
+                    for i := 0; i < unvisitedNum ; i++ { //&& i < c.cfg.Spider.ThreadCount; i++ {
                         // for j := 0; j < c.cfg.Spider.ThreadCount; j++ {
 
                         // }
@@ -107,17 +110,21 @@ func (c *Crawler) crawling() error {
                             }
                             glog.Info(url)
                             c.waitGroup.Wrap(func() {
+                                time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                                 err = c.getHyperLinks(url)
                                 if err != nil {
                                     glog.Error(err.Error())
                                 }
 
-                                time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                                 //d.linkQueue.addVistedUrl(url)
                             })
-                    }     
+                            //time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
+                    }   
+                    fmt.Println("---1----")  
                     c.waitGroup.Wait()
-                    c.currentDeepth ++
+                    fmt.Println("---2----")  
+                    //c.currentDeepth ++
+                    atomic.AddUint64(&c.currentDeepth, 1)
                 } else {
                     break
                 }
@@ -132,6 +139,9 @@ func (c *Crawler) crawling() error {
 
 func (c *Crawler)getHyperLinks(url string) error {
     //defer c.waitGroup.Done()
+    fmt.Println("getHyperLinks: " + url)
+    c.baseHref = ""
+
     c.linkQueue.addVistedUrl(url)
 
     rh := NewReqHttp(url, "GET", c.crawlTimeout)
@@ -148,11 +158,18 @@ func (c *Crawler)getHyperLinks(url string) error {
 		return err
 	}
 
+    doc.Find("base").Each(func(i int, s *goquery.Selection) {
+        tmp, exits := s.Attr("href")
+        if exits {
+            c.baseHref = tmp
+        }
+    })
+
     doc.Find("a").Each(func(i int, s *goquery.Selection) {
         link, exits := s.Attr("href")
         if exits {
             if ! strings.Contains(strings.ToLower(link),strings.ToLower("javascript")) {
-                link, err = util.CheckLink(link, c.host)
+                link, err = util.CheckLink(link, c.host, url, c.baseHref)
                 //fmt.Println(link)
                 if err != nil {
                     glog.Error(err.Error())
@@ -165,7 +182,7 @@ func (c *Crawler)getHyperLinks(url string) error {
             } else {
                 jslink := strings.SplitN(link, "=", 2)[1]
                 
-                jslink, err = util.CheckLink(strings.Replace(jslink, "\"", "", -1), c.host)
+                jslink, err = util.CheckLink(strings.Replace(jslink, "\"", "", -1), c.host, "", c.baseHref)
                 //fmt.Println(jslink)
                 if err != nil {
                     glog.Error(err.Error())
