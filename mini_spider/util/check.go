@@ -6,7 +6,7 @@ import (
 )
 
 import (
-    "github.com/golang/glog"
+	"github.com/golang/glog"
 )
 
 func Check(e error) {
@@ -27,7 +27,7 @@ func CheckBaseurl(rawUrl string) (string, error) {
 	if flag := strings.HasSuffix(rawUrl, "/"); flag != true {
 		rawUrl = rawUrl + "/"
 	}
-	
+
 	return rawUrl, nil
 }
 
@@ -36,13 +36,8 @@ func CheckLink(link, host, rawurl, basePath string) (string, error) {
 
 	var newBasePath string
 
-	// for _, p := range basePathList {
-	// 	newBasePath += p 
-	// 	newBasePath += "/"
-	// }
-
-	for i := 0; i < len(basePathList) -1; i++ {
-		newBasePath += basePathList[i] 
+	for i := 0; i < len(basePathList)-1; i++ {
+		newBasePath += basePathList[i]
 		newBasePath += "/"
 	}
 
@@ -86,7 +81,7 @@ func CheckSrcLink(link, currentPath string) (string, error) {
 	pathList := strings.Split(currentPath, "/")
 	var tmpPath string
 
-	for i := 0; i < len(pathList) - 1; i++ {
+	for i := 0; i < len(pathList)-1; i++ {
 		tmpPath += pathList[i] + "/"
 	}
 

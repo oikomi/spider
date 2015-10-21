@@ -16,8 +16,8 @@ import (
 )
 
 import (
-    "Go-id-3957/mini_spider/conf"
-    "Go-id-3957/mini_spider/core"
+    "Go-id-4777/mini_spider/conf"
+    "Go-id-4777/mini_spider/core"
 )
 
 const (
@@ -76,7 +76,6 @@ func main() {
     // signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
     showHelp := flag.Bool("h", false, "show help info")
-    //versionInfo := flag.Bool("v", true, "show version info")
     showVersion := flag.Bool("vv", false, "show version info")
     confPath := flag.String("c", "../conf", "config conf path")
     logPath := flag.String("l", "../log", "config conf path")

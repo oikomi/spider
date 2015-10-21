@@ -1,7 +1,7 @@
 package core
 
 import (
-	//"time"
+//"time"
 )
 
 import (
@@ -9,19 +9,18 @@ import (
 )
 
 import (
-	"Go-id-3957/mini_spider/conf"
+	"Go-id-4777/mini_spider/conf"
 )
 
 type Spider struct {
 	cfg conf.Config
-
-	rootUrlList   []string
+	rootUrlList []string
 }
 
 func NewSpider(cfg conf.Config, seedUrlList []string) *Spider {
 	return &Spider{
-		cfg:           cfg,
-		rootUrlList:   seedUrlList,
+		cfg:         cfg,
+		rootUrlList: seedUrlList,
 	}
 }
 
@@ -35,4 +34,3 @@ func (s *Spider) Start() {
 		}
 	}
 }
-
