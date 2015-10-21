@@ -1,0 +1,7 @@
+<!-- test ajax link -->
+<script>
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'page3_3.json', false);
+    xhr.send();
+    document.write(JSON.parse(xhr.responseText).data);
+</script>

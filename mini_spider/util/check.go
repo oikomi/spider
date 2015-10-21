@@ -27,6 +27,7 @@ func CheckBaseurl(rawUrl string) (string, error) {
 	if flag := strings.HasSuffix(rawUrl, "/"); flag != true {
 		rawUrl = rawUrl + "/"
 	}
+	
 	return rawUrl, nil
 }
 
@@ -59,7 +60,7 @@ func CheckLink(link, host, rawurl, basePath string) (string, error) {
 		if basePath == "" {
 			link = strings.Join([]string{host, link}, "/")
 		} else {
-			glog.Info("basePath is not null ")
+			//glog.Info("basePath is not null ")
 			//link = strings.Join([]string{host + newBasePath + "/" + basePath, link}, "/")
 			link = newBasePath + "/" + basePath + "/" + link
 		}
@@ -72,6 +73,7 @@ func CheckLink(link, host, rawurl, basePath string) (string, error) {
 func CheckSrcLink(link, currentPath string) (string, error) {
 	u, err := url.Parse(link)
 	if err != nil {
+		glog.Error(err.Error())
 		return "", err
 	}
 	if u.Scheme != "" {

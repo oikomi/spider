@@ -70,46 +70,36 @@ func (c *Crawler) crawling() error {
         }
 
         if c.currentDeepth >= c.cfg.Spider.MaxDepth {
-            glog.Info("========== All links result ==========")
-            c.linkQueue.dispalyVisted()
+            //fmt.Println("========== All links result ==========")
+            //c.linkQueue.dispalyVisted()
             break
         } else {
             for {
                 if c.currentDeepth > c.cfg.Spider.MaxDepth {
                     break
                 }
-                //d.linkQueue.dispalyUnVisted()
-                //glog.Info("-------")
-                //d.linkQueue.dispalyVisted()
+
                 if !c.linkQueue.unVistedUrlsEmpty() { //&& c.currentDeepth <= c.cfg.Spider.MaxDepth {
-
-                    //
                     unvisitedNum := c.linkQueue.getUnvistedUrlCount()
-                    // fixme : 
-                    for i := 0; i < unvisitedNum; i++ { //&& i < c.cfg.Spider.ThreadCount; i++ {
-                        // for j := 0; j < c.cfg.Spider.ThreadCount; j++ {
-
-                        // }
+                    // fixme 
+                    for i := 0; i < unvisitedNum && i < c.cfg.Spider.ThreadCount; i++ {
                             time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
                             url := c.linkQueue.getUnvisitedUrl()
-                            glog.Info(url)
+                            
                             if c.linkQueue.isUrlInVisted(url) {
-                                glog.Info("撞墙")
+                                //glog.Info("撞墙")
                                 continue
                             }
-                            glog.Info(url)
+                            //glog.Info(url)
                             c.waitGroup.Wrap(func() {
-                                
                                 err = c.getHyperLinks(url)
                                 if err != nil {
                                     glog.Error(err.Error())
                                 }
                             })
                             //time.Sleep(c.cfg.Spider.CrawlInterval * time.Second)
-                    }   
-                    fmt.Println("---1----")  
+                    }    
                     c.waitGroup.Wait()
-                    fmt.Println("---2----")  
                     atomic.AddUint64(&c.currentDeepth, 1)
                 } else {
                     break
@@ -123,8 +113,7 @@ func (c *Crawler) crawling() error {
 }
 
 func (c *Crawler)getHyperLinks(url string) error {
-    //defer c.waitGroup.Done()
-    fmt.Println("getHyperLinks: " + url)
+    //fmt.Println("getHyperLinks: " + url)
     c.baseHref = ""
 
     c.linkQueue.addVistedUrl(url)
@@ -135,7 +124,13 @@ func (c *Crawler)getHyperLinks(url string) error {
     if err != nil {
         glog.Error(err.Error())
 		return err
-	}
+	} else {
+        err = StoragePageData(url, c.cfg)
+        if err != nil {
+            glog.Error(err.Error())
+            return err
+        }
+    }
 
     doc, err := goquery.NewDocumentFromResponse(httpRes)
     if err != nil {
@@ -155,26 +150,20 @@ func (c *Crawler)getHyperLinks(url string) error {
         if exits {
             if ! strings.Contains(strings.ToLower(link),strings.ToLower("javascript")) {
                 link, err = util.CheckLink(link, c.host, url, c.baseHref)
-                //fmt.Println(link)
                 if err != nil {
                     glog.Error(err.Error())
             	}
                 if link != "" {
-                    //glog.Info("add url to unvisited list")
-                    //glog.Info(link)
                     c.linkQueue.addUnVistedUrl(link)
                 }
             } else {
                 jslink := strings.SplitN(link, "=", 2)[1]
                 
                 jslink, err = util.CheckLink(strings.Replace(jslink, "\"", "", -1), c.host, "", c.baseHref)
-                //fmt.Println(jslink)
                 if err != nil {
                     glog.Error(err.Error())
                 }
                 if jslink != "" {
-                    //glog.Info("add url to unvisited list")
-                    //glog.Info(jslink)
                     c.linkQueue.addUnVistedUrl(jslink)
                 }
             }
@@ -185,15 +174,14 @@ func (c *Crawler)getHyperLinks(url string) error {
         link, exits := s.Attr("src")
         if exits {
             link, err = util.CheckSrcLink(link, url)
-            //fmt.Println(link)
             if err != nil {
                 glog.Error(err.Error())
             }
             if link != "" {
-                StorageBinaryData(link, c.cfg)
-                //glog.Info("add url to unvisited list")
-                //glog.Info(link)
-                //c.linkQueue.addUnVistedUrl(link)
+                err = StorageBinaryData(link, c.cfg)
+                if err != nil {
+                    glog.Error(err.Error())
+                }
             }
         }
     })

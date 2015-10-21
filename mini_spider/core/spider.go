@@ -36,6 +36,3 @@ func (s *Spider) Start() {
 	}
 }
 
-func (s *Spider) Stop() {
-	glog.Info("Stop")
-}

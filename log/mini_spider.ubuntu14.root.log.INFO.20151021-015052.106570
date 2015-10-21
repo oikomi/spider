@@ -1,0 +1,12 @@
+Log file created at: 2015/10/21 01:50:52
+Running on machine: ubuntu14
+Binary: Built with gc go1.5.1 for linux/amd64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+E1021 01:50:52.018572  106570 http.go:63] GET_DATA_FAILED
+E1021 01:50:52.020105  106570 http.go:64] Failed url is : http://pycm.baidu.com:8081/page4.html
+E1021 01:50:52.020829  106570 crawler.go:128] GET_DATA_FAILED
+E1021 01:50:52.021384  106570 crawler.go:100] GET_DATA_FAILED
+E1021 01:51:02.068954  106570 http.go:63] GET_DATA_FAILED
+E1021 01:51:02.069734  106570 http.go:64] Failed url is : http://pycm.baidu.com:8081/1/page1_3.html
+E1021 01:51:02.070337  106570 crawler.go:128] GET_DATA_FAILED
+E1021 01:51:02.070753  106570 crawler.go:100] GET_DATA_FAILED

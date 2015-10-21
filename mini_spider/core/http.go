@@ -41,7 +41,6 @@ func (r *ReqHttp) SetHeader(key, val string) {
 }
 
 func (r *ReqHttp) DoGetData() (*http.Response, error) {
-	glog.Info("start to download : " + r.url)
 	var err error
 	request, err := http.NewRequest(r.method, r.url, nil)
 	if err != nil {
@@ -59,18 +58,10 @@ func (r *ReqHttp) DoGetData() (*http.Response, error) {
 	}
 
 	if response.StatusCode == 200 {
-		//body, err := ioutil.ReadAll(response.Body)
-		//if err != nil {
-		//glog.Error(err.Error())
-		//return err
-		//}
-		//bodystr := string(body);
-		//fmt.Println(bodystr)
 		return response, nil
 	} else {
-		//glog.Error(response.StatusCode)
 		glog.Error(GET_DATA_FAILED)
-		glog.Info("failed url is : " + r.url)
+		glog.Error("Failed url is : " + r.url)
 		return nil, GET_DATA_FAILED
 	}
 }

@@ -3,10 +3,10 @@ package main
 import (
     "os"
     "fmt"
-    "sync"
+    //"sync"
     "flag"
-    "syscall"
-    "os/signal"
+    // "syscall"
+    // "os/signal"
     "encoding/json"
 )
 
@@ -25,27 +25,13 @@ const (
     CONF_NAME string = "conf.ini"
 )
 
-
-type WaitGroupWrapper struct {
-    sync.WaitGroup
-}
-
-// func (w *WaitGroupWrapper) Wrap(cb func()) {
-//     w.Add(1)
-//     go func() {
-//         cb()
-//         w.Done()
-//     }()
-// }
-
-
 func init() {
-	flag.Set("alsologtostderr", "true")
-	flag.Set("log_dir", "false")
+    flag.Set("alsologtostderr", "false")
+    //flag.Set("log_dir", "false")
 }
 
 func version() string {
-	//fmt.Printf("mini_spider version %s \n", VERSION)
+    //fmt.Printf("mini_spider version %s \n", VERSION)
     return "mini_spider version " + VERSION
 }
 
@@ -64,7 +50,7 @@ func parseSeedUrls(path string) ([]string, error) {
     var seedUrlList []string
     file, err := os.Open(path)
     if err != nil {
-    	//log.Error(err.Error())
+    	glog.Error(err.Error())
     	return nil, err
     }
     defer file.Close()
@@ -72,6 +58,7 @@ func parseSeedUrls(path string) ([]string, error) {
     dec := json.NewDecoder(file)
     err = dec.Decode(&seedUrlList)
     if err != nil {
+        glog.Error(err.Error())
     	return nil, err
     }
     
@@ -79,14 +66,14 @@ func parseSeedUrls(path string) ([]string, error) {
 }
 
 func main() {
-    signalChan := make(chan os.Signal, 1)
-    exitChan := make(chan int)
-    go func() {
-        <-signalChan
-        exitChan <- 1
-    }()
+    // signalChan := make(chan os.Signal, 1)
+    // exitChan := make(chan int)
+    // go func() {
+    //     <-signalChan
+    //     exitChan <- 1
+    // }()
 
-    signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+    // signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
     showHelp := flag.Bool("h", false, "show help info")
     //versionInfo := flag.Bool("v", true, "show version info")
@@ -94,7 +81,8 @@ func main() {
     confPath := flag.String("c", "../conf", "config conf path")
     logPath := flag.String("l", "../log", "config conf path")
     flag.Parse()
-    fmt.Println(*logPath)
+
+    flag.Set("log_dir", *logPath)
 
     if *showHelp {
         showHelpInfo()
@@ -121,8 +109,4 @@ func main() {
     spider := core.NewSpider(cfg, seedUrlList)
 
     spider.Start()
-
-    // <-exitChan
-
-    // spider.Stop()
 }
